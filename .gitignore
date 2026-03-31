@@ -1,0 +1,16 @@
+# Runtime log output — contains PII (email addresses, event subjects)
+logs/
+
+# Real credentials — never commit
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+env/
+venv/
+*.egg-info/
+dist/
+build/
