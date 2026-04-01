@@ -9,6 +9,7 @@ import streamlit as st
 
 from agent.agent_builder import build_agent, extract_token_usage
 from auth.msal_helper import GRAPH_SCOPES, build_public_client_app, get_token_for_account
+from auth.storage import save_token_cache
 from observability.audit import CHAT_TURN, write_audit
 from observability.logger import get_logger
 
@@ -148,15 +149,18 @@ if user_input:
     if "session_id" not in st.session_state:
         st.session_state.session_id = str(uuid.uuid4())
 
+    # Get user's timezone
+    tz_hint = st.session_state.get("active_timezone", "UTC")
+
     # Build (or rebuild) the agent each turn — CalendarPlugin holds fresh token closure
     agent = build_agent(
         get_token_fn=_get_token,
         accounts_map=active_accounts,
         session_id=st.session_state.session_id,
+        user_timezone=tz_hint,
     )
 
     # Inject user timezone hint into the message if not already mentioned
-    tz_hint = st.session_state.get("active_timezone", "UTC")
     augmented_input = (
         f"[User timezone: {tz_hint}]\n{user_input}"
         if tz_hint.lower() not in user_input.lower()
@@ -215,6 +219,8 @@ if user_input:
     # Persist assistant message and update cache
     st.session_state.chat_history.append({"role": "assistant", "content": reply_text})
     st.session_state.token_cache = cache.serialize() if hasattr(cache, "serialize") else st.session_state.get("token_cache", "")
+    # Persist token cache to disk
+    save_token_cache(st.session_state.token_cache)
 
     # Audit the chat turn
     write_audit(

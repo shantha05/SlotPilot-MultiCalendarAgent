@@ -29,12 +29,14 @@ if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
 
 if "token_cache" not in st.session_state:
-    # Serialised MSAL token cache string; kept in memory only (not persisted to disk)
-    st.session_state.token_cache = ""
+    # Load persisted token cache from disk
+    from auth.storage import load_token_cache  # noqa: E402
+    st.session_state.token_cache = load_token_cache() or ""
 
 if "accounts" not in st.session_state:
-    # {label: {"account": msal_account_obj, "email": str}}
-    st.session_state.accounts = {}
+    # Load persisted accounts from disk
+    from auth.storage import load_accounts  # noqa: E402
+    st.session_state.accounts = load_accounts()
 
 if "sk_thread" not in st.session_state:
     # Semantic Kernel ChatHistoryAgentThread; None = start a fresh thread

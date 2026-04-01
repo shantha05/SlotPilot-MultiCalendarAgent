@@ -8,6 +8,7 @@ from auth.msal_helper import (
     interactive_login,
     serialize_cache,
 )
+from auth.storage import save_accounts, save_token_cache
 from observability.audit import ACCOUNT_ADDED, ACCOUNT_REMOVED, write_audit
 from observability.logger import get_logger
 
@@ -21,6 +22,8 @@ st.caption("Connect your Outlook 365 accounts via Microsoft login.")
 
 def _save_cache(cache) -> None:
     st.session_state.token_cache = serialize_cache(cache)
+    # Persist to disk
+    save_token_cache(st.session_state.token_cache)
 
 
 # ── Add account ──────────────────────────────────────────────────────────────
@@ -71,6 +74,8 @@ if st.button("Login with Microsoft", type="primary"):
                         "email": email,
                     }
                     _save_cache(cache)
+                    # Persist accounts to disk
+                    save_accounts(st.session_state.accounts)
 
                     write_audit(
                         ACCOUNT_ADDED,
@@ -120,6 +125,8 @@ else:
                     _log.warning("Could not remove account from MSAL cache", extra={"label": label})
 
                 del st.session_state.accounts[label]
+                # Persist changes to disk
+                save_accounts(st.session_state.accounts)
 
                 write_audit(
                     ACCOUNT_REMOVED,

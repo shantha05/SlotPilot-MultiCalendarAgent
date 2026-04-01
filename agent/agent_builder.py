@@ -12,7 +12,7 @@ from semantic_kernel.agents import ChatCompletionAgent
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 
 from agent.calendar_plugin import CalendarPlugin
-from agent.prompts import SYSTEM_PROMPT
+from agent.prompts import get_system_prompt
 from observability.logger import get_logger
 
 log = get_logger(__name__)
@@ -22,6 +22,7 @@ def build_agent(
     get_token_fn: Callable[[str], Optional[str]],
     accounts_map: dict,
     session_id: str = "",
+    user_timezone: str = "UTC",
 ) -> ChatCompletionAgent:
     """Create a ChatCompletionAgent with the CalendarPlugin attached.
 
@@ -29,6 +30,7 @@ def build_agent(
         get_token_fn:  Callable(account_label) -> access_token str | None.
         accounts_map:  Dict of {label: {account: msal_account, email: str}}.
         session_id:    Streamlit session UUID passed through to audit records.
+        user_timezone: IANA timezone name for the user (e.g. 'America/New_York').
 
     Returns:
         A ready-to-use ChatCompletionAgent.  Auto function calling is enabled
@@ -50,7 +52,7 @@ def build_agent(
     agent = ChatCompletionAgent(
         service=service,
         name="SlotPilot",
-        instructions=SYSTEM_PROMPT,
+        instructions=get_system_prompt(user_timezone),
         plugins=[plugin],
     )
 

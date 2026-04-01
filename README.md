@@ -73,9 +73,13 @@ streamlit run app.py
 2. Add additional accounts as needed
 3. Go to the **Chat** page → select active accounts and timezone in the sidebar
 4. Ask questions like:
-   - *"What meetings do I have tomorrow?"*
-   - *"Am I free on April 10 from 2pm to 3pm EST?"*
-   - *"Book a dentist appointment on April 10 at 2pm for 1 hour"*
+   - *"What meetings do I have today?"* (uses your selected timezone)
+   - *"What meetings do I have tomorrow?"* (calculates based on your timezone)
+   - *"Am I free this afternoon?"* (interprets relative to your local time)
+   - *"Am I free on April 10 from 2pm to 3pm EST?"* (you can specify different timezones)
+   - *"Book a dentist appointment tomorrow at 2pm for 1 hour"* (uses your timezone by default)
+
+**Timezone Awareness**: The agent is fully timezone-aware. Select your timezone in the sidebar, and relative dates/times like "today", "tomorrow", "this morning", "next Monday" will be calculated in your local time. You can also specify different timezones explicitly in your queries (e.g., "2pm EST", "3pm Pacific").
 
 ---
 
